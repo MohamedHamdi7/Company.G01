@@ -14,6 +14,7 @@ namespace Company.G01.PL.Controllers
             repository = _repository;
         }
 
+        [HttpGet] //Get //Cotroller
         public IActionResult Index()
         {
             //DepartmentRepository departmentRepository = new DepartmentRepository();
