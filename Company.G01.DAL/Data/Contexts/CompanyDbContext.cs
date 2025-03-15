@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Company.G01.DAL.Data.Contexts
 {
      public class CompanyDbContext : DbContext
-    {
+     {
         public CompanyDbContext(DbContextOptions<CompanyDbContext> options) :base(options) 
         { 
             
@@ -28,7 +28,7 @@ namespace Company.G01.DAL.Data.Contexts
         //}
 
         public DbSet<Department> Departments { get; set; }
-    }
+     }
 
  
 }
