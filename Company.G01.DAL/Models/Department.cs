@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace Company.G01.DAL.Models
 {
-    public class Department
+    public class Department :BaseEntity
     {
         [Required(ErrorMessage ="not found")]
-        public int Id { get; set; }
+        
         public string Code { get; set; }
 
         [Required(ErrorMessage ="name is required !")]
