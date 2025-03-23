@@ -7,7 +7,7 @@ using Company.G01.DAL.Models;
 
 namespace Company.G01.BLL.Interfaces
 {
-    public interface IDepartmentRepository:IGenericRepository<Department>
+    public interface IDepartmentRepository : IGenericRepository<Department>
     {
         //IEnumerable<Department> GetAll();
 
