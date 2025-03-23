@@ -80,7 +80,7 @@ namespace Company.G01.PL.Controllers
         {
             if (ModelState.IsValid)
             {
-                //if(id == department.Id) return BadRequest();
+                //if(id != department.Id) return BadRequest();
                 //or
                 if (id == department.Id)
                 {
