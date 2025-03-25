@@ -11,6 +11,7 @@ namespace Company.G01.PL.Dtos
         public string Name { get; set; }
 
         [Range(22,60,ErrorMessage ="age must be between(22,60)")]
+        [Required(ErrorMessage ="Age is Required")]
         public int? Age { get; set; }
         [DataType(DataType.EmailAddress,ErrorMessage ="Email is not valid")]
         public string Email { get; set; }

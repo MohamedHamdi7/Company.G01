@@ -9,32 +9,8 @@
 <br />
 
 <div>
-    <div class="my-3">
-        <label asp-for="Id" class="col-form-lable"></label>
-        <input asp-for="Id" class="form-control "readonly />
+    <partial name="DepartmentPartialView/DeleteDetailsView.cshtml" />
 
-
-    </div>
-    <div class="my-3">
-        <label asp-for="Code" class="col-form-lable"></label>
-        <input asp-for="Code" class="form-control "readonly />
-       
-
-    </div>
-
-    <div class="my-3">
-        <label asp-for="Name" class="col-form-lable"></label>
-        <input asp-for="Name" class="form-control "readonly />
-      
-
-    </div>
-
-    <div class="my-3">
-        <label asp-for="CreateAt" class="col-form-lable"></label>
-        <input asp-for="CreateAt" class="form-control "readonly />
-       
-
-    </div>
 
     <div class="my-3">
        <a asp-action="Edit"asp-route-id="@Model.Id" class="btn btn-warning">Edit</a>
