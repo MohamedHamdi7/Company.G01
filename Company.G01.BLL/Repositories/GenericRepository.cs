@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Company.G01.BLL.Interfaces;
 using Company.G01.DAL.Data.Contexts;
 using Company.G01.DAL.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Company.G01.BLL.Repositories
 {
@@ -20,6 +21,10 @@ namespace Company.G01.BLL.Repositories
 
         public IEnumerable<T> GetAll()
         {
+            if(typeof(T)==typeof(Employee))
+            {
+                return (IEnumerable<T>) context.Employees.Include(E=>E.Department).ToList();
+            }
            return context.Set<T>().ToList();
         }
 
@@ -35,6 +40,7 @@ namespace Company.G01.BLL.Repositories
         }
         public int Update(T model)
         {
+
             context.Set<T>().Update(model);
             return context.SaveChanges();
         }

@@ -9,11 +9,13 @@ namespace Company.G01.PL.Controllers
     public class EmployeeController : Controller
     {
         private readonly IEmployeeRepository repository;
+        private readonly IDepartmentRepository departmentRepository;
 
         //ctor
-        public EmployeeController(IEmployeeRepository _repository)
+        public EmployeeController(IEmployeeRepository _repository,IDepartmentRepository _departmentRepository)
         {
             repository = _repository;
+            departmentRepository = _departmentRepository;
         }
 
 
@@ -22,12 +24,22 @@ namespace Company.G01.PL.Controllers
         public IActionResult Index()
         {
             var employee = repository.GetAll();
+            //Dictionary:3 property
+            //1-ViewData :Transfer Extar E=Information From Controller(Action) To View
+            //ViewData["Message"] = "welcome from viewdata";
+
+            //2-ViewBag  :Transfer Extar E=Information From Controller(Action) To View
+            //ViewBag.Message = "welcome from viewbag";
+
+            //3-TempData : in cerate 
             return View(employee);
         }
 
         [HttpGet]
         public IActionResult Create()
         {
+            var department=departmentRepository.GetAll();
+            ViewData["department"]=department;
             return View();
         }
 
@@ -49,11 +61,13 @@ namespace Company.G01.PL.Controllers
                     Salary = model.Salary,
                     IsActive = model.IsActive,
                     IsDelete = model.IsDelete,
+                    DepartmentId=model.DepartmentId,
 
                 };
                 var count=repository.Add(employee);
                 if (count > 0)
                 {
+                    TempData["Message"] = "Employee is Created";  //Dictionary 
                     return RedirectToAction("Index");
                 }
             }
@@ -63,6 +77,8 @@ namespace Company.G01.PL.Controllers
         [HttpGet]
         public IActionResult Details(int?id,string ViewName="Details")
         {
+            var department = departmentRepository.GetAll();
+            ViewData["department"] = department;
             if (id is null) return BadRequest("invalid id");
             var employee = repository.Get(id.Value);
             if (employee == null) return NotFound(new {Statuscode=404 , message=$"Employee with id{id}is not found"});
@@ -72,6 +88,8 @@ namespace Company.G01.PL.Controllers
         [HttpGet]
         public IActionResult Edit(int?id)
         {
+            var department = departmentRepository.GetAll();
+            ViewData["department"] = department;
             return Details(id, "Edit");
         }
 
@@ -99,6 +117,8 @@ namespace Company.G01.PL.Controllers
         [HttpGet]
         public IActionResult Delete(int?id)
         {
+            var department=departmentRepository.GetAll();
+            ViewData["department"]=department;
             return Details(id, "Delete");
         }
 

@@ -46,6 +46,7 @@ namespace Company.G01.PL.Controllers
                 var count=repository.Add(deparetment);
                 if(count>0)
                 {
+                    TempData["Message"] = "Department is created";
                     return RedirectToAction(nameof(Index));   
                 }
 
