@@ -1,11 +1,28 @@
 ﻿@model IEnumerable<Employee>
 @{
     ViewData["Title"] = "Index";
+    // string? ViewDataMessage = ViewData["Message"] as string;
+    // string? ViewDataMessage = ViewBag.Message;
 }
 
 <h1>All Employee</h1>
 <br /> 
 <br />
+
+@* <div class="m-3 alert alert-danger"> *@
+@*     <p>@ViewData["Message"]</p> *@
+@* </div> *@
+
+@* <div class="m-3 alert alert-danger"> *@
+@*     <p>@ViewBag.Message</p> *@
+@* </div> *@
+
+@if(!string.IsNullOrEmpty(TempData["Message"]as string))
+{
+    <div class="m-3 alert alert-info">
+        <p>@TempData["Message"]</p>
+    </div>
+}
 
 <div class="my-3">
     <a asp-action="Create"asp-controller="Employee"class="btn btn-primary">Create Employee</a>
@@ -29,6 +46,7 @@
                 <th>IsDelete</th>
                 <th>@Html.DisplayNameFor(E=>E.HiringDate)</th>
                 <th>@Html.DisplayNameFor(E=>E.CreateAt)</th>
+                <th>Department</th>
                 <th>Datils</th>
                 <th>Update</th>
                 <th>Delete</th>
@@ -50,6 +68,13 @@
                     <td>@item.IsDelete</td>
                     <td>@item.HiringDate</td>
                     <td>@item.CreateAt</td>
+                   @if(item.Department is null)
+                   {
+                       <td>no department</td>
+                   }else
+                   {
+                        <td>@item.Department?.Name</td>
+                   }
 
 
                     <partial name="_ButtonPartialView" model="@item.Id" />
