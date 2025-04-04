@@ -4,27 +4,31 @@ using Company.G01.BLL.Repositories;
 using Company.G01.DAL.Models;
 using Company.G01.PL.Dtos;
 using Microsoft.AspNetCore.Mvc;
+using NuGet.Protocol.Core.Types;
 
 namespace Company.G01.PL.Controllers
 {
     public class EmployeeController : Controller
     {
-        private readonly IEmployeeRepository repository;
-        private readonly IDepartmentRepository departmentRepository;
+        //private readonly IEmployeeRepository repository;
+        //private readonly IDepartmentRepository departmentRepository;
         private readonly IMapper mapper;
+        private readonly IUnitOfWork unitOfWork;
 
 
         //ctor
         public EmployeeController
             (
-            IEmployeeRepository _repository,
-            IDepartmentRepository _departmentRepository,
-            IMapper _mapper
+            //IEmployeeRepository _repository,
+            //IDepartmentRepository _departmentRepository,
+            IMapper _mapper,
+            IUnitOfWork _unitOfWork
             )
         {
-            repository = _repository;
-            departmentRepository = _departmentRepository;
+            //repository = _repository;
+            //departmentRepository = _departmentRepository;
             mapper = _mapper;
+            unitOfWork = _unitOfWork;
         }
 
 
@@ -36,15 +40,16 @@ namespace Company.G01.PL.Controllers
 
             if (string.IsNullOrEmpty(SearchInput))
             {
-                 employees = repository.GetAll();
+                 //employees = repository.GetAll();
+                 employees = unitOfWork.EmployeeRepository.GetAll();
             }
             else
             {
-                 employees=repository.GetByName(SearchInput);
+                //employees=repository.GetByName(SearchInput);
+                employees = unitOfWork.EmployeeRepository.GetByName(SearchInput);
+
             }
-
-
-            
+            #region Dictionary
             //Dictionary:3 property
             //1-ViewData :Transfer Extar E=Information From Controller(Action) To View
             //ViewData["Message"] = "welcome from viewdata";
@@ -52,14 +57,15 @@ namespace Company.G01.PL.Controllers
             //2-ViewBag  :Transfer Extar E=Information From Controller(Action) To View
             //ViewBag.Message = "welcome from viewbag";
 
-            //3-TempData : in cerate 
+            //3-TempData : in cerate  
+            #endregion
             return View(employees);
         }
 
         [HttpGet]
         public IActionResult Create()
         {
-            var department=departmentRepository.GetAll();
+            var department= unitOfWork.DepartmentRepository.GetAll();
             ViewData["department"]=department;
             return View();
         }
@@ -70,6 +76,7 @@ namespace Company.G01.PL.Controllers
         {
             if (ModelState.IsValid)
             {
+                #region manual mapping
                 //var employee = new Employee()
                 //{
                 //    Name = model.Name,
@@ -84,9 +91,11 @@ namespace Company.G01.PL.Controllers
                 //    IsDelete = model.IsDelete,
                 //    DepartmentId=model.DepartmentId,
 
-                //};
-                var employee = mapper.Map< Employee>(model);
-                var count=repository.Add(employee);
+                //}; 
+                #endregion
+                var employee = mapper.Map< Employee>(model);  //Automatic Mapping with Auto Mapper
+                 unitOfWork.EmployeeRepository.Add(employee);
+                var count = unitOfWork.Complete();  //---> save changes
                 if (count > 0)
                 {
                     TempData["Message"] = "Employee is Created";  //Dictionary 
@@ -97,24 +106,28 @@ namespace Company.G01.PL.Controllers
         }
 
         [HttpGet]
-        public IActionResult Details(int?id,string ViewName="Details")
+        public IActionResult Details(int? id , string ViewName="Details")
         {
-            var department = departmentRepository.GetAll();
-            ViewData["department"] = department;
+            //var department = unitOfWork.DepartmentRepository.GetAll();
+            //ViewData["department"] = department;
+
             if (id is null) return BadRequest("invalid id");
-            var employee = repository.Get(id.Value);
+            var employee = unitOfWork.EmployeeRepository.Get(id.Value);
+
             if (employee == null) return NotFound(new {Statuscode=404 , 
                 message=$"Employee with id{id}is not found"});
             return View(ViewName,employee);
         }
 
         [HttpGet]
-        public IActionResult Edit(int?id)
+        public IActionResult Edit(int? id)
         {
-            var department = departmentRepository.GetAll();
+            var department = unitOfWork.DepartmentRepository.GetAll();
             ViewData["department"] = department;
+
             if (id is null) return BadRequest("invalid id");
-            var employee = repository.Get(id.Value);
+            var employee = unitOfWork.EmployeeRepository.Get(id.Value);
+
             if (employee == null) return NotFound(new { Statuscode = 404,
                 message = $"Employee with id{id}is not found" });
 
@@ -133,7 +146,8 @@ namespace Company.G01.PL.Controllers
                 if (id == employee.Id)
                 {
                    
-                    var count = repository.Update(employee);
+                    unitOfWork.EmployeeRepository.Update(employee);
+                    var count = unitOfWork.Complete();
 
                     if (count > 0)
                     {
@@ -148,8 +162,8 @@ namespace Company.G01.PL.Controllers
         [HttpGet]
         public IActionResult Delete(int?id)
         {
-            var department=departmentRepository.GetAll();
-            ViewData["department"]=department;
+            //var department=unitOfWork.DepartmentRepository.GetAll();
+            //ViewData["department"]=department;
             return Details(id, "Delete");
         }
 
@@ -162,8 +176,10 @@ namespace Company.G01.PL.Controllers
           {
                 if (id == employee.Id)
                 {
-                    var count = repository.Delete(employee);
-                    if(count > 0)
+                    unitOfWork.EmployeeRepository.Delete(employee);
+                    var count = unitOfWork.Complete();
+
+                    if (count > 0)
                     {
                         return RedirectToAction("Index");
                     }
