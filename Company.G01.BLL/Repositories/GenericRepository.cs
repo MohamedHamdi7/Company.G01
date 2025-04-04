@@ -37,21 +37,21 @@ namespace Company.G01.BLL.Repositories
             return context.Set<T>().Find(id);
         }
 
-        public int Add(T model)
+        public void Add(T model)
         {
             context.Set<T>().Add(model);
-            return context.SaveChanges();
-        }
-        public int Update(T model)
-        {
+            //return context.SaveChanges();
 
-            context.Set<T>().Update(model);
-            return context.SaveChanges();
         }
-        public int Delete(T model)
+        public void Update(T model)
+        {
+            context.Set<T>().Update(model);
+            //return context.SaveChanges();
+        }
+        public void Delete(T model)
         {
             context.Set<T>().Remove(model);
-            return context.SaveChanges();
+            //return context.SaveChanges();
         }
 
         

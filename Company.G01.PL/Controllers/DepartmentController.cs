@@ -10,28 +10,39 @@ namespace Company.G01.PL.Controllers
 {
     public class DepartmentController : Controller
     {
-       private readonly IDepartmentRepository repository;
+
+        //private readonly IDepartmentRepository repository;
+        private readonly IUnitOfWork unitOfWork;
         private readonly IMapper mapper;
 
         //Ask clr to create object fromDepartmentRepository From Call him from ctor and use Services(Scoppe)
-        public DepartmentController(IDepartmentRepository _repository,IMapper _mapper)
+        public DepartmentController
+            (
+
+            //IDepartmentRepository _repository, 
+
+            IUnitOfWork _unitOfWork,
+            IMapper _mapper
+
+            )
         {
-            repository = _repository; //ctor
+            //repository = _repository; //ctor
+            unitOfWork = _unitOfWork;
             mapper = _mapper;
         }
 
         [HttpGet] //Get //Cotroller
         public IActionResult Index(string? SearchInput)
         {
-            //DepartmentRepository departmentRepository = new DepartmentRepository();
             IEnumerable<Department> department;
+
             if (string.IsNullOrEmpty(SearchInput))
             {
-                department = repository.GetAll();
+                department = unitOfWork.DepartmentRepository.GetAll();
             }
             else
             {
-                department = repository.GetByName(SearchInput);
+                department = unitOfWork.DepartmentRepository.GetByName(SearchInput);
                 
             }
             
@@ -50,17 +61,21 @@ namespace Company.G01.PL.Controllers
         {
            if(ModelState.IsValid)
            {
+                #region manual mapping
                 //manual mapping
                 //var deparetment = new Department()
                 //{
                 //    Code = model.Code,
                 //    Name = model.Name,
                 //    CreateAt = model.CreateAt
-                //};
+                //}; 
+                #endregion
 
                 var department = mapper.Map<Department>(model);   //AutoMapping using AutoMapper
-                var count=repository.Add(department);
-                if(count>0)
+                unitOfWork.DepartmentRepository.Add(department);
+                var result = unitOfWork.Complete();
+
+                if (result>0)
                 {
                     TempData["Message"] = "Department is created";  //Dictionary
                     return RedirectToAction(nameof(Index));   
@@ -76,7 +91,7 @@ namespace Company.G01.PL.Controllers
         public IActionResult Details(int? id , string viewName="Details")
         {
             if (id is null) return BadRequest("invalid id");
-            var department=repository.Get(id.Value);
+            var department=unitOfWork.DepartmentRepository.Get(id.Value);
             if(department is null) return NotFound(new {stutascode=404,message=$"department with{id}is not found"});
             //var dto = mapper.Map<CreateDepartmentdto>(department);
 
@@ -87,7 +102,7 @@ namespace Company.G01.PL.Controllers
         public IActionResult Edit(int? id)
         {
             if (id is null) return BadRequest("invalid id");
-            var department = repository.Get(id.Value);
+            var department = unitOfWork.DepartmentRepository.Get(id.Value);
             if (department is null) return NotFound();
             var dto = mapper.Map<CreateDepartmentdto>(department);
             return View(dto);
@@ -104,7 +119,9 @@ namespace Company.G01.PL.Controllers
                 //or
                 if (id == department.Id)
                 {
-                    var result = repository.Update(department);
+                     unitOfWork.DepartmentRepository.Update(department);
+                    var result = unitOfWork.Complete();
+
                     if (result > 0)
                     {
                         return RedirectToAction(nameof(Index));
@@ -156,8 +173,9 @@ namespace Company.G01.PL.Controllers
             {
                 if (id == department.Id)
                 {
-                    var result = repository.Delete(department);
-                    if(result > 0)
+                   unitOfWork.DepartmentRepository.Delete(department);
+                    var result = unitOfWork.Complete();
+                    if (result > 0)
                     {
                         return RedirectToAction(nameof(Index));
                     }
