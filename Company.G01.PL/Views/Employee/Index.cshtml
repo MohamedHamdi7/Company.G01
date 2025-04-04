@@ -5,6 +5,7 @@
     // string? ViewDataMessage = ViewBag.Message;
 }
 
+
 <h1>All Employee</h1>
 <br /> 
 <br />
@@ -23,7 +24,18 @@
         <p>@TempData["Message"]</p>
     </div>
 }
-
+<form>
+    <div class="container m-4">
+        <div class="row justify-content-center">
+            <div class="col-6">
+                <input placeholder="Search" name="SearchInput" class="form-control" />
+            </div>
+           <div class="col-6">
+                <input type="submit" class="btn btn-success" value="Search" />
+           </div>
+        </div>
+    </div>
+</form>
 <div class="my-3">
     <a asp-action="Create"asp-controller="Employee"class="btn btn-primary">Create Employee</a>
 </div>

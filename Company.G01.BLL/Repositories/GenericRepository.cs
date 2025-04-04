@@ -30,6 +30,10 @@ namespace Company.G01.BLL.Repositories
 
         public T? Get(int id)
         {
+            if (typeof(T) == typeof(Employee))
+            {
+                return context.Employees.Include(E => E.Department).FirstOrDefault(E=>E.Id==id) as T;
+            }
             return context.Set<T>().Find(id);
         }
 

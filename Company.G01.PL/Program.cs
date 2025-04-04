@@ -1,6 +1,7 @@
 using Company.G01.BLL.Interfaces;
 using Company.G01.BLL.Repositories;
 using Company.G01.DAL.Data.Contexts;
+using Company.G01.PL.Mapping;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -20,7 +21,9 @@ namespace Company.G01.PL
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
             }); //Allow DI For ComanyDbContect
-
+            //builder.Services.AddAutoMapper(typeof(EmployeeProfile));
+            builder.Services.AddAutoMapper(M => M.AddProfile(new EmployeeProfile()));
+            builder.Services.AddAutoMapper(M=>M.AddProfile(new DepartmentProfile()));
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
