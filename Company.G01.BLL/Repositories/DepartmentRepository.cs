@@ -9,17 +9,22 @@ using Company.G01.DAL.Models;
 
 namespace Company.G01.BLL.Repositories
 {
-    public class DepartmentRepository : GenericRepository<Department>,IDepartmentRepository
+    public class DepartmentRepository : GenericRepository<Department>, IDepartmentRepository
     {
 
 
 
-        //private readonly CompanyDbContext context; //Null
+        private readonly CompanyDbContext context; //Null
 
-        // Ask Clr To Call Object from CompanyDbContext 
+        //Ask Clr To Call Object from CompanyDbContext
         public DepartmentRepository(CompanyDbContext _context) :base(_context)
         {
-            //context = _context;
+            context = _context;
+        }
+
+       public List<Department> GetByName(string name)
+        {
+            return context.Departments.Where(D => D.Name.ToLower().Contains(name.ToLower())).ToList();
         }
 
         //public IEnumerable<Department> GetAll()

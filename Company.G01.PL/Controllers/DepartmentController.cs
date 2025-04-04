@@ -1,4 +1,5 @@
-﻿using Company.G01.BLL.Interfaces;
+﻿using AutoMapper;
+using Company.G01.BLL.Interfaces;
 using Company.G01.BLL.Repositories;
 using Company.G01.DAL.Models;
 using Company.G01.PL.Dtos;
@@ -10,18 +11,30 @@ namespace Company.G01.PL.Controllers
     public class DepartmentController : Controller
     {
        private readonly IDepartmentRepository repository;
+        private readonly IMapper mapper;
 
         //Ask clr to create object fromDepartmentRepository From Call him from ctor and use Services(Scoppe)
-        public DepartmentController(IDepartmentRepository _repository)
+        public DepartmentController(IDepartmentRepository _repository,IMapper _mapper)
         {
-            repository = _repository;
+            repository = _repository; //ctor
+            mapper = _mapper;
         }
 
         [HttpGet] //Get //Cotroller
-        public IActionResult Index()
+        public IActionResult Index(string? SearchInput)
         {
             //DepartmentRepository departmentRepository = new DepartmentRepository();
-            var department=repository.GetAll();
+            IEnumerable<Department> department;
+            if (string.IsNullOrEmpty(SearchInput))
+            {
+                department = repository.GetAll();
+            }
+            else
+            {
+                department = repository.GetByName(SearchInput);
+                
+            }
+            
             return View(department);
         }
 
@@ -37,16 +50,19 @@ namespace Company.G01.PL.Controllers
         {
            if(ModelState.IsValid)
            {
-                var deparetment = new Department()
-                {
-                    Code = model.Code,
-                    Name = model.Name,
-                    CreateAt = model.CreateAt
-                };
-                var count=repository.Add(deparetment);
+                //manual mapping
+                //var deparetment = new Department()
+                //{
+                //    Code = model.Code,
+                //    Name = model.Name,
+                //    CreateAt = model.CreateAt
+                //};
+
+                var department = mapper.Map<Department>(model);   //AutoMapping using AutoMapper
+                var count=repository.Add(department);
                 if(count>0)
                 {
-                    TempData["Message"] = "Department is created";
+                    TempData["Message"] = "Department is created";  //Dictionary
                     return RedirectToAction(nameof(Index));   
                 }
 
@@ -62,16 +78,19 @@ namespace Company.G01.PL.Controllers
             if (id is null) return BadRequest("invalid id");
             var department=repository.Get(id.Value);
             if(department is null) return NotFound(new {stutascode=404,message=$"department with{id}is not found"});
-            return View(viewName,department);
+            //var dto = mapper.Map<CreateDepartmentdto>(department);
+
+            return View(viewName, department);
         }
 
         [HttpGet]
         public IActionResult Edit(int? id)
         {
-            //if (id is null) return BadRequest("invalid id");
-            //var department=repository.Get(id.Value);
-            //if (department is null) return NotFound();
-            return Details(id,"Edit");
+            if (id is null) return BadRequest("invalid id");
+            var department = repository.Get(id.Value);
+            if (department is null) return NotFound();
+            var dto = mapper.Map<CreateDepartmentdto>(department);
+            return View(dto);
 
         }
 
