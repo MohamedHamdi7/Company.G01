@@ -1,4 +1,4 @@
-﻿@model Employee
+﻿@model CreateEmployeeDto
 @{
     ViewData["Title"] = "Details";
 }
@@ -8,6 +8,11 @@
 <br />
  <form>
     <partial name="EmployeePartialView/DeleteDetailsView.cshtml" />
+    <input asp-for="ImageName" hidden />
+
+
+
+
 
     <div class="my-3">
         <a asp-action="Edit"asp-route-id="@Model.Id" class="btn btn-primary">Edit</a>

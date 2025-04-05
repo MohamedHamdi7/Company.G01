@@ -12,6 +12,7 @@ namespace Company.G01.PL.Controllers
     {
 
         //private readonly IDepartmentRepository repository;
+
         private readonly IUnitOfWork unitOfWork;
         private readonly IMapper mapper;
 
@@ -93,9 +94,9 @@ namespace Company.G01.PL.Controllers
             if (id is null) return BadRequest("invalid id");
             var department=unitOfWork.DepartmentRepository.Get(id.Value);
             if(department is null) return NotFound(new {stutascode=404,message=$"department with{id}is not found"});
-            //var dto = mapper.Map<CreateDepartmentdto>(department);
+            var dto = mapper.Map<CreateDepartmentdto>(department);
 
-            return View(viewName, department);
+            return View(viewName, dto);
         }
 
         [HttpGet]
@@ -111,22 +112,23 @@ namespace Company.G01.PL.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit([FromRoute] int id, Department department)
+        public IActionResult Edit([FromRoute] int id, CreateDepartmentdto department)
         {
             if (ModelState.IsValid)
             {
                 //if(id != department.Id) return BadRequest();
                 //or
-                if (id == department.Id)
-                {
-                     unitOfWork.DepartmentRepository.Update(department);
+                var dto=mapper.Map<Department>(department);  //Auto Mapper
+                 dto.Id = id;
+                
+                     unitOfWork.DepartmentRepository.Update(dto);
                     var result = unitOfWork.Complete();
 
                     if (result > 0)
                     {
                         return RedirectToAction(nameof(Index));
                     }
-                }
+                
 
             }
             return View(department);
@@ -167,19 +169,20 @@ namespace Company.G01.PL.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Delete([FromRoute]int id,Department department)
+        public IActionResult Delete([FromRoute]int id,CreateDepartmentdto department)
         {
             if (ModelState.IsValid)
             {
-                if (id == department.Id)
-                {
-                   unitOfWork.DepartmentRepository.Delete(department);
+               var dto= mapper.Map<Department>(department);
+                dto.Id=id;
+                
+                   unitOfWork.DepartmentRepository.Delete(dto);
                     var result = unitOfWork.Complete();
                     if (result > 0)
                     {
                         return RedirectToAction(nameof(Index));
                     }
-                }
+                
             }
             return View(department);
         }

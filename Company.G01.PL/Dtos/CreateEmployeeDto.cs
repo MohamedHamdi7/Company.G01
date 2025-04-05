@@ -1,14 +1,15 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using Company.G01.DAL.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Company.G01.PL.Dtos
 {
     public class CreateEmployeeDto
     {
-
+        public int Id { get; set; }
         [Required(ErrorMessage = "Name is requird")]
-        public string EmpName { get; set; }
+        public string Name { get; set; }
 
         [Range(22,60,ErrorMessage ="age must be between(22,60)")]
         [Required(ErrorMessage ="Age is Required")]
@@ -32,6 +33,11 @@ namespace Company.G01.PL.Dtos
 
         public DateTime CreateAt { get; set; }
         public int?  DepartmentId { get; set; }
+        public string? ImageName { get; set; }
+
+        public IFormFile? Image { get; set; }
+        public Department? Department { get; set; }
+
 
     }
 }

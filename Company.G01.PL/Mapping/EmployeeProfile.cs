@@ -11,8 +11,8 @@ namespace Company.G01.PL.Mapping
     {
         public EmployeeProfile()
         {              //from          :     to
-            CreateMap<CreateEmployeeDto, Employee>()
-                .ForMember(d=>d.Name, o=>o.MapFrom(s=>s.EmpName));
+            CreateMap<CreateEmployeeDto, Employee>();
+                //.ForMember(d=>d.Name, o=>o.MapFrom(s=>s.Name));
          // CreateMap<CreateEmployeeDto, Employee>().ReverseMap; ==  CreateMap<Employee, CreateEmployeeDto>();
 
             CreateMap<Employee, CreateEmployeeDto>();
