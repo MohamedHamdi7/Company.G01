@@ -3,6 +3,7 @@ using Company.G01.BLL.Interfaces;
 using Company.G01.BLL.Repositories;
 using Company.G01.DAL.Models;
 using Company.G01.PL.Dtos;
+using Company.G01.PL.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using NuGet.Protocol.Core.Types;
 
@@ -74,7 +75,7 @@ namespace Company.G01.PL.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(CreateEmployeeDto model)
         {
-            if (ModelState.IsValid)
+            if (ModelState.IsValid) //Server Side Validation
             {
                 #region manual mapping
                 //var employee = new Employee()
@@ -93,6 +94,13 @@ namespace Company.G01.PL.Controllers
 
                 //}; 
                 #endregion
+
+                if(model.Image is not null)
+                {
+                  model.ImageName=   DocumentSettings.UploadFile(model.Image, "image");
+                }
+
+
                 var employee = mapper.Map< Employee>(model);  //Automatic Mapping with Auto Mapper
                  unitOfWork.EmployeeRepository.Add(employee);
                 var count = unitOfWork.Complete();  //---> save changes
@@ -116,7 +124,8 @@ namespace Company.G01.PL.Controllers
 
             if (employee == null) return NotFound(new {Statuscode=404 , 
                 message=$"Employee with id{id}is not found"});
-            return View(ViewName,employee);
+            var dto=mapper.Map<CreateEmployeeDto>(employee);
+            return View(ViewName,dto);
         }
 
         [HttpGet]
@@ -137,14 +146,24 @@ namespace Company.G01.PL.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit([FromRoute]int id,Employee employee)
+        public IActionResult Edit([FromRoute]int id,CreateEmployeeDto model)
         {
             if (ModelState.IsValid)
             {
+                if(model.ImageName is not null && model.Image is not null)
+                {
+                    DocumentSettings.DeleteFile(model.ImageName, "image");
+                }
+                if(model.Image is not null)
+                {
+                    model.ImageName= DocumentSettings.UploadFile(model.Image, "image");
+                }
+
                
 
-                if (id == employee.Id)
-                {
+                 var employee= mapper.Map<Employee>(model);
+                 employee.Id = id;
+                
                    
                     unitOfWork.EmployeeRepository.Update(employee);
                     var count = unitOfWork.Complete();
@@ -153,9 +172,9 @@ namespace Company.G01.PL.Controllers
                     {
                         return RedirectToAction("Index");
                     }
-                }
+                
             }
-            return View(employee);
+            return View(model);
         }
 
 
@@ -164,29 +183,50 @@ namespace Company.G01.PL.Controllers
         {
             //var department=unitOfWork.DepartmentRepository.GetAll();
             //ViewData["department"]=department;
-            return Details(id, "Delete");
+
+            if (id is null) return BadRequest("invalid id");
+            var employee = unitOfWork.EmployeeRepository.Get(id.Value);
+
+            if (employee == null) return NotFound(new
+            {
+                Statuscode = 404,
+                message = $"Employee with id {id} is not found"
+            });
+
+            var Dto = mapper.Map<CreateEmployeeDto>(employee);
+            return View(Dto);
         }
 
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Delete([FromRoute]int? id,Employee employee)
+        public IActionResult Delete([FromRoute]int? id,CreateEmployeeDto model)
         {
           if(ModelState.IsValid)
           {
-                if (id == employee.Id)
-                {
-                    unitOfWork.EmployeeRepository.Delete(employee);
+
+                var dto =mapper.Map<Employee>(model);
+                id = dto.Id;
+                
+                
+                    unitOfWork.EmployeeRepository.Delete(dto);
+
+
                     var count = unitOfWork.Complete();
 
                     if (count > 0)
                     {
-                        return RedirectToAction("Index");
+                        if(dto.ImageName is not  null)
+                        {
+                        DocumentSettings.DeleteFile(model.ImageName, "image");
+
+                        }
+                          return RedirectToAction("Index");
                     }
-                }
+                
                 
           }
-            return View(employee); 
+            return View(model); 
         }
     }
 }
