@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Company.G01.BLL.Interfaces;
 using Company.G01.DAL.Data.Contexts;
 using Company.G01.DAL.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Company.G01.BLL.Repositories
 {
@@ -22,9 +23,9 @@ namespace Company.G01.BLL.Repositories
             context = _context;
         }
 
-       public List<Department> GetByName(string name)
+       public async Task<List<Department>> GetByNameAsync(string name)
         {
-            return context.Departments.Where(D => D.Name.ToLower().Contains(name.ToLower())).ToList();
+            return await context.Departments.Where(D => D.Name.ToLower().Contains(name.ToLower())).ToListAsync();
         }
 
         //public IEnumerable<Department> GetAll()

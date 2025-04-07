@@ -30,14 +30,14 @@ namespace Company.G01.BLL
 
 
         // method to make one only save change
-        public int Complete()
+        public async Task<int> CompleteAsync()
         {
-          return  context.SaveChanges();
+          return await  context.SaveChangesAsync();
         }
 
-        public void Dispose()
+        public async ValueTask DisposeAsync()
         {
-           context.Dispose();
+           await context.DisposeAsync();
         }
     }
 }

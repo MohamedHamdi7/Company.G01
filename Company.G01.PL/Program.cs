@@ -50,4 +50,11 @@ namespace Company.G01.PL
             app.Run();
         }
     }
+
+
+    //class Test
+    //{
+    //    // Synchronous >>>>
+    //    //Asynchronous >>>>
+    //}
 }
